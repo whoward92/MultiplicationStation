@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 
-class MultiplicationStation
+class MathStation
 {
-    //private static Timer answerTimer;
-    //private static bool answerReceived;
-    //private static int userAnswer;
-    //private static bool timeExpired;
-
     static void Main(string[] args)
     {
         Random random = new Random();
@@ -20,6 +15,7 @@ class MultiplicationStation
 
         Console.WriteLine("Select Difficulty Level: 1-Easy, 2-Medium, 3-Hard");
         int difficulty = Convert.ToInt32(Console.ReadLine());
+
         int maxNumber = difficulty switch
         {
             1 => 10, // Easy: Numbers between 1 and 10
@@ -37,13 +33,46 @@ class MultiplicationStation
             _ => 10000, // Default to Easy
         };
 
+        Console.WriteLine("Select operations to include (e.g., 1 2 3 4 for all): 1-Addition, 2-Subtraction, 3-Multiplication, 4-Division");
+        string[] selectedOperations = Console.ReadLine().Split();
+
         while (keepPlaying)
         {
+            // Select a random operation from the chosen ones
+            int operation = Convert.ToInt32(selectedOperations[random.Next(selectedOperations.Length)]);
+
             int num1 = random.Next(1, maxNumber + 1);
             int num2 = random.Next(1, maxNumber + 1);
-            int correctAnswer = num1 * num2;
+            int correctAnswer = 0;
+            string question = "";
 
-            Console.WriteLine($"What is {num1} * {num2}?");
+            switch (operation)
+            {
+                case 1: // Addition
+                    correctAnswer = num1 + num2;
+                    question = $"{num1} + {num2}";
+                    break;
+                case 2: // Subtraction
+                    correctAnswer = num1 - num2;
+                    question = $"{num1} - {num2}";
+                    break;
+                case 3: // Multiplication
+                    correctAnswer = num1 * num2;
+                    question = $"{num1} * {num2}";
+                    break;
+                case 4: // Division
+                    // Ensure division results in a whole number
+                    while (num2 == 0 || num1 % num2 != 0)
+                    {
+                        num1 = random.Next(1, maxNumber + 1);
+                        num2 = random.Next(1, maxNumber + 1);
+                    }
+                    correctAnswer = num1 / num2;
+                    question = $"{num1} / {num2}";
+                    break;
+            }
+
+            Console.WriteLine($"What is {question}?");
 
             stopwatch.Start();
             int userAnswer = Convert.ToInt32(Console.ReadLine());
@@ -64,8 +93,10 @@ class MultiplicationStation
                 Console.WriteLine($"Incorrect! The correct answer is {correctAnswer}. Time taken: {timeTaken.TotalSeconds} seconds.");
             }
 
-            Console.WriteLine("Play again? (yes/no)");
-            keepPlaying = Console.ReadLine().Trim().ToLower() == "yes";
+            Console.WriteLine("Play again? (yes/y/no/n)");
+            string userResponse = Console.ReadLine().Trim().ToLower();
+            string[] acceptedYesAnswers = { "yes", "y" };
+            keepPlaying = Array.Exists(acceptedYesAnswers, answer => answer == userResponse);
         }
 
         if (questionsAsked > 0)
